@@ -1,0 +1,7 @@
+logs
+target
+.metals/
+.bloop/
+.settings/
+
+/RUNNING_PID
