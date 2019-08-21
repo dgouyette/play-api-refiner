@@ -34,7 +34,7 @@ class DefaultBodyParsers @Inject()(
             println(errorHandler.getClass())
             errorHandler match {
               case _ : DefaultHttpErrorHandler => {
-                val msg = JsError.toFlatForm(jsError).mkString("\n")
+                val msg =s"${request.method}  on ${request.uri}"+ JsError.toFlatForm(jsError).mkString("\n")
                 Future.successful(Left(Results.BadRequest(msg)))
               }
               case _ => Future.successful(Left(Results.BadRequest(JsError.toJson(jsError))))
