@@ -3,5 +3,5 @@ target
 .metals/
 .bloop/
 .settings/
-
+.idea/
 /RUNNING_PID
