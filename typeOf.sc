@@ -1,8 +1,21 @@
-def handle(a: Any): Unit = a match {
-  case vs: List[String] => println("strings: " + vs.map(_.size).sum)
-  case vs: List[Int]    => println("ints: " + vs.sum)
-  case _ =>
+import eu.timepit.refined._
+import eu.timepit.refined.collection._
+import eu.timepit.refined.api.Refined
+import eu.timepit.refined.auto._
+import eu.timepit.refined.numeric._
+import scala.reflect.runtime.universe._
+
+import shapeless.ops.nat.ToInt
+import shapeless.nat._
+import shapeless.Nat
+
+def extractSize[T <: Nat](x: String Refined MinSize[T]) = {
+
 }
 
-handle(List("hello", "world")) // output: "strings: 10"
-handle(List(1, 2, 3))          // ClassCastException... oh no!
+
+val zero : String Refined MinSize[_0] = "xxx"
+val un : String Refined MinSize[ToInt[_1]] = "xxx"
+
+extractSize(zero)
+extractSize(un)

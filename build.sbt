@@ -21,10 +21,9 @@ Compile / scalacOptions += "-Ymacro-annotations"
 
 
 
-libraryDependencies ++= Seq(
-  "eu.timepit" %% "refined"                 % "0.9.9")
+libraryDependencies ++= Seq( "eu.timepit" %% "refined"                 % "0.9.9")
 
- 
+
 
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.controllers._"
