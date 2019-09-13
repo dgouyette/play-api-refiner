@@ -17,7 +17,8 @@ import eu.timepit.refined.types.numeric.PosInt
 
 
 case class SimpleDTO(first : String Refined NonEmpty,
-                    second : Int Refined Positive
+                    second : Int Refined Positive,
+                    third : List[Int]
 
 )
 

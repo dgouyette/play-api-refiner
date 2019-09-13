@@ -18,6 +18,7 @@ class StackSpec extends PlaySpec {
 
   case class SimpleString(a : String)
   case class SimpleInt(b : Int)
+  case class SimpleNumbers(a : BigDecimal, b : Double, c : Float)
   case class IntRefinedPositive(c : Int Refined Positive)
   case class StringNonEmpty(d : String Refined NonEmpty)
   case class CollectionStringNonEmpty(e : List[String] Refined NonEmpty)
@@ -47,6 +48,12 @@ class StackSpec extends PlaySpec {
   "Int not refined" must {
     "return a schema with type Int" in {
       JsonSchema.jsonSchema[SimpleInt] mustBe """{"b":{"type":"integer"}}"""
+    }
+  }
+
+  "BigDecimal not refined" must {
+    "return a schema with type number" in {
+      JsonSchema.jsonSchema[SimpleNumbers] mustBe """{"a":{"type":"number"},"b":{"type":"number"},"c":{"type":"number"}}"""
     }
   }
 

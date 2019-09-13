@@ -20,7 +20,6 @@ import shapeless.syntax.typeable
 import eu.timepit.refined.api.Refined
 object JsonSchema {
 
-
   def jsonSchema[T]: String = macro impl[T]
 
   def impl[T: c.WeakTypeTag](c: scala.reflect.macros.whitebox.Context): c.Expr[String] = {
@@ -32,22 +31,13 @@ object JsonSchema {
     val andTypeOf = typeOf[And[_,_]]
     val listTypeOf = typeOf[List[_]]
     def subTypeOfListTypeOf[T : TypeTag] = typeOf[List[T]]
-
-    
     val nonEmptyTypeOf = typeOf[NonEmpty]
-
-
-
 
     val r = weakTypeOf[T].decls.collect {
       case m: MethodSymbol if m.isCaseAccessor =>
         val (typeSymbol,typeArgs) = m.info match {
-          case NullaryMethodType(v) => {
-
-            (v.typeSymbol.asType.toType,v.typeArgs)
-          }
+          case NullaryMethodType(v) => (v.typeSymbol.asType.toType,v.typeArgs)
         }
-
 
         val supportedFormats = List("IPv4", "IPv6", "Uri")
 
@@ -57,25 +47,23 @@ object JsonSchema {
           toInt.asInstanceOf[ToInt[_]].apply()
         }
         
-    
-
         def size(p : Type) : Int = p.typeArgs match {          
             case List(other) => other.toString().replace("shapeless.nat._", "").toInt // ugly patch  but no simple solution for now
-      }
+        }
 
       def extractArgs(typeArgs : Seq[Type]) :JsObject =  {
         typeArgs match {
 
           case _type :: Nil if _type =:=  typeOf[String]  => Json.obj("type" -> "string")
           case _type :: Nil if _type =:= typeOf[Int]  => Json.obj("type" -> "integer")
+          case _type :: Nil if _type =:= typeOf[BigDecimal] ||  _type =:= typeOf[Double] || _type =:= typeOf[Float]  => Json.obj("type" -> "number")
+
           case _refinedType :: _type :: _predicate :: Nil  if _refinedType <:< refinedTypeOf =>  extractArgs(List(_type)) ++ extractArgs(List(_predicate))
           case _predicate :: Nil if _predicate =:= typeOf[Positive] => Json.obj("minValue" ->JsNumber(1))
           case _type :: _predicate :: Nil if _type <:< listTypeOf => Json.obj("type" -> "array")  ++ Json.obj("items"-> extractArgs(List(_predicate)))
           case _type :: Nil if _type <:< subTypeOfListTypeOf[String] => Json.obj("type" -> "array")  ++ Json.obj("items"-> Json.obj("type" -> "string"))
           case _type :: Nil if _type <:< subTypeOfListTypeOf[Int] => Json.obj("type" -> "array")  ++ Json.obj("items"-> Json.obj("type" -> "integer"))
 
-
-          
           case _predicate :: Nil if supportedFormats.contains(_predicate.typeSymbol.name.toString())  =>Json.obj("format" -> _predicate.typeSymbol.name.toString().toLowerCase())
           case _predicate :: Nil if _predicate <:< minSizeTypeOf =>  Json.obj("minLength" ->JsNumber(size(_predicate)))
           case _predicate :: Nil if _predicate <:< maxSizeTypeOf =>  Json.obj("maxLength" ->  JsNumber(size(_predicate)))
@@ -91,5 +79,4 @@ object JsonSchema {
     val json = r.reduce(_ ++ _)
     c.Expr[String](q"""${json.toString()}""")
   }
-
 }
