@@ -46,13 +46,13 @@ class StackSpec extends PlaySpec {
 
   "Int not refined" must {
     "return a schema with type Int" in {
-      JsonSchema.jsonSchema[SimpleInt] mustBe """{"b":{"type":"int"}}"""
+      JsonSchema.jsonSchema[SimpleInt] mustBe """{"b":{"type":"integer"}}"""
     }
   }
 
   "Int refined Positive" must {
     "return a schema with type Int" in {
-      JsonSchema.jsonSchema[IntRefinedPositive] mustBe """{"c":{"minValue":1,"type":"int"}}"""
+      JsonSchema.jsonSchema[IntRefinedPositive] mustBe """{"c":{"minValue":1,"type":"integer"}}"""
     }
   }
 
@@ -64,26 +64,26 @@ class StackSpec extends PlaySpec {
 
   "Collection[String] Refined NonEmpty" must {
     "return a schema with type Collection[String] and minLength" in {
-      JsonSchema.jsonSchema[CollectionStringNonEmpty] mustBe """{"e":{"minLength":1,"type":"array"}}"""
+      JsonSchema.jsonSchema[CollectionStringNonEmpty] mustBe """{"e":{"minLength":1,"type":"array","items":{"type":"string"}}}"""
     }
   }
 
   "Collection[Int] " must {
     "return a schema with type Collection[Int] " in {
-      JsonSchema.jsonSchema[CollectionIntNonEmpty] mustBe """{"ee":{"minLength":1,"type":"array"}}"""
+      JsonSchema.jsonSchema[CollectionIntNonEmpty] mustBe """{"ee":{"minLength":1,"type":"array","items":{"type":"integer"}}}"""
     }
   }
 
 
 "Collection[String] with no Refined " must {
   "return a schema with type array " in {
-    JsonSchema.jsonSchema[CollectionStringNotRefined] mustBe """{"eee":{"type":"array"}}"""
+    JsonSchema.jsonSchema[CollectionStringNotRefined] mustBe """{"eee":{"type":"array","items":{"type":"string"}}}"""
   }
 }
 
 "Collection[Int] with no Refined " must {
   "return a schema with type array " in {
-    JsonSchema.jsonSchema[CollectionIntNotRefined] mustBe """{"eee":{"type":"array"}}"""
+    JsonSchema.jsonSchema[CollectionIntNotRefined] mustBe """{"eee":{"type":"array","items":{"type":"integer"}}}"""
   }
 }
 
@@ -107,7 +107,7 @@ class StackSpec extends PlaySpec {
 
   "case class with multiples fields" must {
     "return a schema with all the fields" in {
-      JsonSchema.jsonSchema[ClassWithTwoFields] mustBe """{"i":{"minLength":1,"type":"string"},"j":{"minValue":1,"type":"int"}}"""
+      JsonSchema.jsonSchema[ClassWithTwoFields] mustBe """{"i":{"minLength":1,"type":"string"},"j":{"minValue":1,"type":"integer"}}"""
     }
   }
 

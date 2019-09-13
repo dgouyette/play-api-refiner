@@ -28,8 +28,12 @@ object JsonSchema {
     val refinedTypeOf = typeOf[Refined[_, _]]
     val minSizeTypeOf = typeOf[MinSize[_]]
     val maxSizeTypeOf = typeOf[MaxSize[_]]
+    val sizeTC = typeOf[eu.timepit.refined.collection.Size[_]]
     val andTypeOf = typeOf[And[_,_]]
     val listTypeOf = typeOf[List[_]]
+    def subTypeOfListTypeOf[T : TypeTag] = typeOf[List[T]]
+
+    
     val nonEmptyTypeOf = typeOf[NonEmpty]
 
 
@@ -47,6 +51,13 @@ object JsonSchema {
 
         val supportedFormats = List("IPv4", "IPv6", "Uri")
 
+        def sizeT(sizeTyp : Type) : Int = {
+          val toIntTree = c.inferImplicitValue(c.typecheck(tq"_root_.shapeless.ops.nat.ToInt[$sizeTyp]", mode = c.TYPEmode).tpe, silent = false)
+          val toInt = c.eval(c.Expr(c.untypecheck(toIntTree.duplicate)))
+          toInt.asInstanceOf[ToInt[_]].apply()
+        }
+        
+    
 
         def size(p : Type) : Int = p.typeArgs match {          
             case List(other) => other.toString().replace("shapeless.nat._", "").toInt // ugly patch  but no simple solution for now
@@ -56,19 +67,23 @@ object JsonSchema {
         typeArgs match {
 
           case _type :: Nil if _type =:=  typeOf[String]  => Json.obj("type" -> "string")
-          case _type :: Nil if _type =:= typeOf[Int]  => Json.obj("type" -> "int")
+          case _type :: Nil if _type =:= typeOf[Int]  => Json.obj("type" -> "integer")
           case _refinedType :: _type :: _predicate :: Nil  if _refinedType <:< refinedTypeOf =>  extractArgs(List(_type)) ++ extractArgs(List(_predicate))
           case _predicate :: Nil if _predicate =:= typeOf[Positive] => Json.obj("minValue" ->JsNumber(1))
-          
-          case _type ::   _ if _type <:< listTypeOf => Json.obj("type" -> "array")
+          case _type :: _predicate :: Nil if _type <:< listTypeOf => Json.obj("type" -> "array")  ++ Json.obj("items"-> extractArgs(List(_predicate)))
+          case _type :: Nil if _type <:< subTypeOfListTypeOf[String] => Json.obj("type" -> "array")  ++ Json.obj("items"-> Json.obj("type" -> "string"))
+          case _type :: Nil if _type <:< subTypeOfListTypeOf[Int] => Json.obj("type" -> "array")  ++ Json.obj("items"-> Json.obj("type" -> "integer"))
+
 
           
           case _predicate :: Nil if supportedFormats.contains(_predicate.typeSymbol.name.toString())  =>Json.obj("format" -> _predicate.typeSymbol.name.toString().toLowerCase())
           case _predicate :: Nil if _predicate <:< minSizeTypeOf =>  Json.obj("minLength" ->JsNumber(size(_predicate)))
           case _predicate :: Nil if _predicate <:< maxSizeTypeOf =>  Json.obj("maxLength" ->  JsNumber(size(_predicate)))
+          case _predicate :: Nil if _predicate <:< sizeTC =>  Json.obj("maxLength" ->  JsNumber(sizeT(_predicate)))
+
           case _predicate :: Nil if _predicate <:< andTypeOf =>   _predicate.typeArgs.map(p =>extractArgs(List(p))).reduce(_ ++ _)
           case _predicate :: Nil  if _predicate =:= nonEmptyTypeOf =>  Json.obj("minLength"-> 1)
-          case other => Json.obj("type" ->  "other", "value"-> other.map(_.toString()).mkString)
+          case other => Json.obj("type" ->  "other", "value"-> other.map(_.toString()).mkString, "class"-> other.getClass().toGenericString())
         }
       }
         Json.obj(m.name.decodedName.toString->  extractArgs(List(typeSymbol)  ++ typeArgs))
