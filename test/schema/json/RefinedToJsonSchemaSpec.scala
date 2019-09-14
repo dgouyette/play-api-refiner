@@ -25,8 +25,12 @@ class StackSpec extends PlaySpec {
   case class CollectionIntNonEmpty(ee : List[Int] Refined NonEmpty)
   case class CollectionStringNotRefined(eee : List[String])
   case class CollectionIntNotRefined(eee : List[Int])
-
-
+  
+  sealed trait TrafficLight
+  case object Red extends TrafficLight
+  case object Orange extends TrafficLight
+  case object Green extends TrafficLight
+  case class SimpleEnum(e : TrafficLight)
 
 
   case class StringFormatIPV4(f : String Refined IPv4)
@@ -142,5 +146,10 @@ class StackSpec extends PlaySpec {
       JsonSchema.jsonSchema[StringWithMinMax] mustBe """{"m":{"minLength":0,"type":"string","maxLength":5}}"""
     }  
   }
-  
+
+  "sealed trait with objdct" must {
+    "return enum with all value as a string" in {
+      JsonSchema.jsonSchema[SimpleEnum] mustBe """{"e":{"enum":["red","orange","green"],"type":"string"}}"""
+    }  
+  }
 }
