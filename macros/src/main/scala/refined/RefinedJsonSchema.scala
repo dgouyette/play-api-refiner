@@ -1,6 +1,5 @@
 package refined
 
-
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.numeric.Positive
 import scala.language.experimental.macros
@@ -18,10 +17,12 @@ import shapeless.ops.nat.ToInt
 import scala.collection.immutable.Map
 import shapeless.syntax.typeable
 import eu.timepit.refined.api.Refined
+
+case class JsonSchema(value : String)
 object JsonSchema {
 
   def jsonSchema[T]: String = macro impl[T]
-
+  
   def impl[T: c.WeakTypeTag](c: scala.reflect.macros.whitebox.Context): c.Expr[String] = {
     import c.universe._
     val refinedTypeOf = typeOf[Refined[_, _]]
@@ -30,12 +31,15 @@ object JsonSchema {
     val sizeTC = typeOf[eu.timepit.refined.collection.Size[_]]
     val andTypeOf = typeOf[And[_,_]]
     val listTypeOf = typeOf[List[_]]
+
     def subTypeOfListTypeOf[T : TypeTag] = typeOf[List[T]]
     val nonEmptyTypeOf = typeOf[NonEmpty]
     def isSealedTrait[T  : TypeTag]= weakTypeOf[T].typeSymbol
 
     val r = weakTypeOf[T].decls.collect {
       case m: MethodSymbol if m.isCaseAccessor =>
+      Thread.sleep(200)
+
         val (typeSymbol,typeArgs) = m.info match {
           case NullaryMethodType(v) => (v.typeSymbol.asType.toType,v.typeArgs)
         }
@@ -61,16 +65,16 @@ object JsonSchema {
 
       def extractArgs(typeArgs : Seq[Type]) :JsObject =  {
         typeArgs match {
+          case _type :: _predicate :: Nil if _type <:< listTypeOf => Json.obj("type" -> "array")  ++ Json.obj("items"-> extractArgs(List(_predicate)))
+          case _refinedType :: _type :: _predicate :: Nil   =>  extractArgs(List(_type)) ++ extractArgs(List(_predicate))
 
           case _type :: Nil if _type =:=  typeOf[String]  => Json.obj("type" -> "string")
           case _type :: Nil if _type =:= typeOf[Int]  => Json.obj("type" -> "integer")
           case _type :: Nil if _type =:= typeOf[BigDecimal] ||  _type =:= typeOf[Double] || _type =:= typeOf[Float]  => Json.obj("type" -> "number")
 
-
-
-          case _refinedType :: _type :: _predicate :: Nil  if _refinedType <:< refinedTypeOf =>  extractArgs(List(_type)) ++ extractArgs(List(_predicate))
           case _predicate :: Nil if _predicate =:= typeOf[Positive] => Json.obj("minValue" ->JsNumber(1))
-          case _type :: _predicate :: Nil if _type <:< listTypeOf => Json.obj("type" -> "array")  ++ Json.obj("items"-> extractArgs(List(_predicate)))
+          
+          
           case _type :: Nil if _type <:< subTypeOfListTypeOf[String] => Json.obj("type" -> "array")  ++ Json.obj("items"-> Json.obj("type" -> "string"))
           case _type :: Nil if _type <:< subTypeOfListTypeOf[Int] => Json.obj("type" -> "array")  ++ Json.obj("items"-> Json.obj("type" -> "integer"))
           case _type :: Nil if _type.typeSymbol.asClass.isSealed  => Json.obj("enum" ->values(_type.typeSymbol),"type" -> "string")
@@ -82,12 +86,12 @@ object JsonSchema {
 
           case _predicate :: Nil if _predicate <:< andTypeOf =>   _predicate.typeArgs.map(p =>extractArgs(List(p))).reduce(_ ++ _)
           case _predicate :: Nil  if _predicate =:= nonEmptyTypeOf =>  Json.obj("minLength"-> 1)
-          case other => Json.obj("type" ->  "other", "value"-> other.map(_.toString()).mkString, "class"-> other.getClass().toGenericString())
+          case other => Json.obj("type" ->  "other", "value"-> other.map(o => "["+o.toString()+"]").mkString(","), "class"-> other.getClass().toGenericString())
         }
       }
         Json.obj(m.name.decodedName.toString->  extractArgs(List(typeSymbol)  ++ typeArgs))
     }
-    val json = r.reduce(_ ++ _)
+    val json =  r.reduce(_ ++ _)
     c.Expr[String](q"""${json.toString()}""")
   }
 }

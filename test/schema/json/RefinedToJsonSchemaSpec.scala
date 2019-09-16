@@ -13,10 +13,10 @@ import org.scalatestplus.play._
 import refined.JsonSchema
 
 
-
 class StackSpec extends PlaySpec {
 
   case class SimpleString(a : String)
+  case class SimpleOptionString(aa : Option[String])
   case class SimpleInt(b : Int)
   case class SimpleNumbers(a : BigDecimal, b : Double, c : Float)
   case class IntRefinedPositive(c : Int Refined Positive)
@@ -147,9 +147,10 @@ class StackSpec extends PlaySpec {
     }  
   }
 
-  "sealed trait with objdct" must {
+  "sealed trait with object" must {
     "return enum with all value as a string" in {
       JsonSchema.jsonSchema[SimpleEnum] mustBe """{"e":{"enum":["red","orange","green"],"type":"string"}}"""
     }  
   }
+
 }

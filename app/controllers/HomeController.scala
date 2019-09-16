@@ -13,16 +13,23 @@ import domain.SimpleDTO
 import bodyParsers.DefaultBodyParsers
 import com.fasterxml.jackson.databind.jsonschema.JsonSerializableSchema
 import refined.JsonSchema
+import domain.Red
 
 @Singleton
 class HomeController @Inject()(cc: ControllerComponents, bp : DefaultBodyParsers) extends AbstractController(cc) {
+   
+
+  implicit val dtoSchema =  JsonSchema(JsonSchema.jsonSchema[SimpleDTO])
+  
+  println(dtoSchema)
+
 
   
   def index() = Action { implicit request: Request[AnyContent] =>
-    Ok(Json.toJson(SimpleDTO("a key", 2,List(5) )).as[JsObject] ++ Json.obj("_schema"-> Json.parse(JsonSchema.jsonSchema[SimpleDTO]).as[JsObject]) )
+    Ok(Json.toJson(SimpleDTO("a key", 2,List(5), List("value"), Red, BigDecimal(42) )).as[JsObject])
   }
 
-  def create() = Action(bp.json(SimpleDTO.fmt)) {
+  def create() = Action(bp.jsonRefined(SimpleDTO.fmt,dtoSchema)) {
     implicit request => 
     Created
   }
