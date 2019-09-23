@@ -8,7 +8,6 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject._
 import play.api.http.HttpErrorHandler
 import refined.JsonSchema
-import scala.reflect.runtime.universe._
 import play.api.libs.json.Json
 import play.api.libs.json.JsObject
 

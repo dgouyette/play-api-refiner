@@ -11,26 +11,20 @@ import play.api._
 import play.api.mvc._
 import domain.SimpleDTO
 import bodyParsers.DefaultBodyParsers
-import com.fasterxml.jackson.databind.jsonschema.JsonSerializableSchema
 import refined.JsonSchema
 import domain.Red
 
 @Singleton
-class HomeController @Inject()(cc: ControllerComponents, bp : DefaultBodyParsers) extends AbstractController(cc) {
+class HomeController @Inject()(cc: ControllerComponents, bp : DefaultBodyParsers, routesProvider: Provider[play.api.routing.Router]) extends AbstractController(cc) {
    
-
-  implicit val dtoSchema =  JsonSchema(JsonSchema.jsonSchema[SimpleDTO])
+  implicit val dtoSchema: JsonSchema =  JsonSchema(JsonSchema.jsonSchema[SimpleDTO])
   
-  println(dtoSchema)
-
-
-  
-  def index() = Action { implicit request: Request[AnyContent] =>
+  def index() : Action[Unit] = Action(parse.empty) { implicit request =>
     Ok(Json.toJson(SimpleDTO("a key", 2,List(5), List("value"), Red, BigDecimal(42) )).as[JsObject])
   }
 
-  def create() = Action(bp.jsonRefined(SimpleDTO.fmt,dtoSchema)) {
-    implicit request => 
+  def create(): Action[SimpleDTO] = Action(bp.jsonRefined(SimpleDTO.fmt,dtoSchema)) {
+    implicit request =>
     Created
   }
 }
