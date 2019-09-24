@@ -1,34 +1,26 @@
 package refined
 
-import eu.timepit.refined.collection.NonEmpty
-import eu.timepit.refined.numeric.Positive
-import scala.language.experimental.macros
-import play.api.libs.json._
-import play.api.libs.functional.syntax._
-import eu.timepit.refined.string.IPv4
-import eu.timepit.refined.string.IPv6
-import eu.timepit.refined.string.Uri
-import eu.timepit.refined.collection._
-import eu.timepit.refined.boolean._
-import shapeless.nat._
-import shapeless.Nat
-import shapeless.Nats
-import shapeless.ops.nat.ToInt
-import scala.collection.immutable.Map
-import shapeless.syntax.typeable
 import eu.timepit.refined.api.Refined
+import eu.timepit.refined.boolean._
+import eu.timepit.refined.collection.{NonEmpty, _}
+import eu.timepit.refined.numeric.Positive
+import org.slf4j.LoggerFactory
+import play.api.libs.json._
+import shapeless.ops.nat.ToInt
+
+import scala.language.experimental.macros
 
 case class JsonSchema(value : String)
 object JsonSchema {
+
+  private lazy val LOGGER = LoggerFactory.getLogger(JsonSchema.getClass.toGenericString)
 
   def jsonSchema[T]: String = macro impl[T]
   
   def getJsonSchema(c: scala.reflect.macros.whitebox.Context)(t : c.universe.Type) = {
     import c.universe._
-   
     val r = buildJsonSchema(c)(c.WeakTypeTag(t))
-    val json =  r.reduce(_ ++ _)
-    c.Expr[String](q"""${json.toString()}""")
+    c.Expr[String](q"""${r.toString()}""")
   }
   
   private def buildJsonSchema[T](c: scala.reflect.macros.whitebox.Context)(implicit tag: c.WeakTypeTag[T]) = {
@@ -44,12 +36,6 @@ object JsonSchema {
         case List(other) => other.toString().replace("shapeless.nat._", "").toInt // ugly patch  but no simple solution for now
     }
 
-    def values(traitType : Symbol) : List[String] = {
-      val children = traitType.asClass.knownDirectSubclasses
-      val x = children.map(c => Ident(c.asInstanceOf[scala.reflect.internal.Symbols#Symbol].sourceModule.asInstanceOf[Symbol])).toList
-      x.map(_.toString().toLowerCase())
-    }
-
     val refinedTypeOf = typeOf[Refined[_, _]]
     val minSizeTypeOf = typeOf[MinSize[_]]
     val maxSizeTypeOf = typeOf[MaxSize[_]]
@@ -57,9 +43,9 @@ object JsonSchema {
     val andTypeOf = typeOf[And[_,_]]
     val listTypeOf = typeOf[List[_]]
 
-    def subTypeOfListTypeOf[T : TypeTag] = typeOf[List[T]]
+    def subTypeOfListTypeOf[P : TypeTag] = typeOf[List[P]]
     val nonEmptyTypeOf = typeOf[NonEmpty]
-    def isSealedTrait[T  : TypeTag]= weakTypeOf[T].typeSymbol
+    def isSealedTrait[P  : TypeTag]= weakTypeOf[P].typeSymbol
 
      val r = weakTypeOf[T].decls.collect {
       case m: MethodSymbol if m.isCaseAccessor =>
@@ -115,14 +101,13 @@ object JsonSchema {
       }
         Json.obj(m.name.decodedName.toString->  extractArgs(List(typeSymbol)  ++ typeArgs))
     }
-    r
-    
+    JsArray(r.toList)
+
   }
 
   def impl[T: c.WeakTypeTag](c: scala.reflect.macros.whitebox.Context): c.Expr[String] = {
     import c.universe._
     val r = buildJsonSchema(c)
-    val json =  r.reduce(_ ++ _)
-    c.Expr[String](q"""${json.toString()}""")
+    c.Expr[String](q"""${r.toString()}""")
   }
 }

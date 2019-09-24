@@ -4,7 +4,7 @@
 # ~~~~
 
 # An example controller showing a sample home page
-#GET     /                           controllers.HomeController.index
+GET     /                           controllers.HomeController.index
 POST    /                           controllers.HomeController.create
 GET     /doc                        controllers.SwaggerController.home
 #->      /                        controllers.SwaggerRefined.ApiRouter
