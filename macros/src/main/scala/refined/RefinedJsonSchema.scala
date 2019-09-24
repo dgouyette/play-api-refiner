@@ -101,7 +101,7 @@ object JsonSchema {
       }
         Json.obj(m.name.decodedName.toString->  extractArgs(List(typeSymbol)  ++ typeArgs))
     }
-    JsArray(r.toList)
+    r.foldLeft(Json.obj())(_ deepMerge _)
 
   }
 
