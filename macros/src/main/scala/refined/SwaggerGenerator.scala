@@ -9,9 +9,9 @@ import scala.io.Source
 import scala.language.experimental.macros
 import scala.reflect.macros.whitebox
 
-object RouteParser {
+object SwaggerGenerator {
 
-  def bodyType: Any = macro impl
+  def fromRouteFile: Any = macro impl
 
   lazy val routes: Seq[Route] = {
 
@@ -33,16 +33,17 @@ object RouteParser {
 
   def impl(c: scala.reflect.macros.whitebox.Context): c.Expr[JsValue] = {
     import c.universe._
-    val bodyTypes = routes.toList.flatMap(r =>getBodyType(c, r.call))
+    val bodyTypes = routes.toList.flatMap(r =>getBodyType(c, r))
     val jsons = JsonSchema.getJsonSchemas(c)(bodyTypes)
+
     c.Expr(q"""${jsons}""")
   }
 
-  private def getBodyType(c: whitebox.Context, handlerCall: HandlerCall): Option[(HandlerCall,c.universe.Type)] = {
+  private def getBodyType(c: whitebox.Context, r: Route): Option[(Route,c.universe.Type)] = {
     import c.universe._
 
 
-    val controllerClass = c.mirror.staticClass(controllerPath(handlerCall))
+    val controllerClass = c.mirror.staticClass(controllerPath(r.call))
     val clazzInfo = controllerClass.info
     val publicMethods = clazzInfo.decls.filterNot(_.isPrivate).filter(_.isMethod)
 
@@ -50,7 +51,7 @@ object RouteParser {
 
     publicMethods
       .filter(_.asMethod.typeSignature.resultType <:< actionT)
-      .filter(_.asMethod.name.decodedName.toString == handlerCall.method)
-      .flatMap(_.asMethod.typeSignature.resultType.typeArgs.headOption).headOption.map((handlerCall,_))
+      .filter(_.asMethod.name.decodedName.toString == r.call.method)
+      .flatMap(_.asMethod.typeSignature.resultType.typeArgs.headOption).headOption.map((r,_))
   }
 }

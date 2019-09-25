@@ -5,7 +5,7 @@ import eu.timepit.refined.collection.{NonEmpty, _}
 import eu.timepit.refined.numeric.Positive
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
-import play.routes.compiler.HandlerCall
+import play.routes.compiler.{HandlerCall, Route}
 import shapeless.ops.nat.ToInt
 
 import scala.language.experimental.macros
@@ -30,14 +30,13 @@ object JsonSchema {
     c.Expr[JsValue](q"""${r}""")
   }
 
-  def getJsonSchemas(c: scala.reflect.macros.whitebox.Context)(types : List[(HandlerCall,c.universe.Type)]) = {
+  def getJsonSchemas(c: scala.reflect.macros.whitebox.Context)(types : List[(Route,c.universe.Type)]) = {
     import c.universe._
-    val json = types.map(t=> Json.obj( t._1.packageName.getOrElse("")+"_"+t._1.method ->  buildJsonSchema(c)(c.WeakTypeTag(t._2)))    ).reduce( _ deepMerge _)
-
-
-
+    val json = types.map(t => Json.obj(s"/${t._1.path.toString()}" -> Json.obj(t._1.verb.value.toLowerCase() -> Json.obj("parameters" -> buildJsonSchema(c)(c.WeakTypeTag(t._2)))))).reduce(_ deepMerge _)
     implicit val l: c.universe.Liftable[JsObject] = Liftable((in: JsObject) => q"play.api.libs.json.Json.parse(${in.toString()})")
-    c.Expr[JsValue](q"""${json}""")
+    val header = Json.obj("openapi"-> "3.0.0")
+    val paths = Json.obj("paths"-> json)
+    c.Expr[JsValue](q"""${header ++ paths}""")
   }
 
   private def buildJsonSchema[T](c: scala.reflect.macros.whitebox.Context)(implicit tag: c.WeakTypeTag[T]) = {

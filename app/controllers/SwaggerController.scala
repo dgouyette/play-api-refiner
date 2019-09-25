@@ -9,7 +9,7 @@ class SwaggerController @Inject()(cc: ControllerComponents) extends AbstractCont
 
   def home: Action[Unit] = Action(parse.empty) {
     implicit  req =>
-      Ok(refined.RouteParser.bodyType)
+      Ok(refined.SwaggerGenerator.fromRouteFile)
 
   }
 }
