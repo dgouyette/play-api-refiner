@@ -9,7 +9,7 @@ import scala.io.Source
 import scala.language.experimental.macros
 import scala.reflect.macros.whitebox
 
-object SwaggerGenerator {
+object OpenAPI {
 
   def fromRouteFile: Any = macro impl
 
@@ -34,7 +34,7 @@ object SwaggerGenerator {
   def impl(c: scala.reflect.macros.whitebox.Context): c.Expr[JsValue] = {
     import c.universe._
     val bodyTypes = routes.toList.flatMap(r =>getBodyType(c, r))
-    val jsons = JsonSchema.getJsonSchemas(c)(bodyTypes)
+    val jsons = JsonSchema.openAPI(c)(bodyTypes)
 
     c.Expr(q"""${jsons}""")
   }

@@ -30,7 +30,7 @@ object JsonSchema {
     c.Expr[JsValue](q"""${r}""")
   }
 
-  def getJsonSchemas(c: scala.reflect.macros.whitebox.Context)(types : List[(Route,c.universe.Type)]) = {
+  def openAPI(c: scala.reflect.macros.whitebox.Context)(types : List[(Route,c.universe.Type)]) = {
     import c.universe._
     val json = types.map(t => Json.obj(s"/${t._1.path.toString()}" -> Json.obj(t._1.verb.value.toLowerCase() -> Json.obj("parameters" -> buildJsonSchema(c)(c.WeakTypeTag(t._2)))))).reduce(_ deepMerge _)
     implicit val l: c.universe.Liftable[JsObject] = Liftable((in: JsObject) => q"play.api.libs.json.Json.parse(${in.toString()})")
