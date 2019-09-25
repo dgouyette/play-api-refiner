@@ -6,28 +6,31 @@ import eu.timepit.refined.collection.{NonEmpty, _}
 import eu.timepit.refined.numeric.Positive
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
+import refined.JsonSchema.buildJsonSchema
 import shapeless.ops.nat.ToInt
 
 import scala.language.experimental.macros
 
-case class JsonSchema(value : String)
 object JsonSchema {
 
   private lazy val LOGGER = LoggerFactory.getLogger(JsonSchema.getClass.toGenericString)
 
-  def jsonSchema[T]: JsObject = macro impl[T]
+  def jsonSchema[T]: JsValue = macro impl[T]
 
-  def impl[T: c.WeakTypeTag](c: scala.reflect.macros.whitebox.Context): c.Expr[JsObject] = {
+  def impl[T: c.WeakTypeTag](c: scala.reflect.macros.whitebox.Context): c.Expr[JsValue] = {
     import c.universe._
-    c.Expr[JsObject](q"""${play.api.libs.json.Json.obj("hello"->"world")}""")
+    val r = buildJsonSchema(c)
+    implicit val l: c.universe.Liftable[JsObject] = Liftable((in: JsObject) => q"play.api.libs.json.Json.parse(${in.toString()})")
+    c.Expr[JsValue](q"""${r}""")
   }
-  
+
   def getJsonSchema(c: scala.reflect.macros.whitebox.Context)(t : c.universe.Type) = {
     import c.universe._
     val r = buildJsonSchema(c)(c.WeakTypeTag(t))
-    c.Expr[String](q"""${r.toString()}""")
+    implicit val l: c.universe.Liftable[JsObject] = Liftable((in: JsObject) => q"play.api.libs.json.Json.parse(${in.toString()})")
+    c.Expr[JsValue](q"""${r}""")
   }
-  
+
   private def buildJsonSchema[T](c: scala.reflect.macros.whitebox.Context)(implicit tag: c.WeakTypeTag[T]) = {
     import c.universe._
 
@@ -50,7 +53,6 @@ object JsonSchema {
 
     def subTypeOfListTypeOf[P : TypeTag] = typeOf[List[P]]
     val nonEmptyTypeOf = typeOf[NonEmpty]
-    def isSealedTrait[P  : TypeTag]= weakTypeOf[P].typeSymbol
 
      val r = weakTypeOf[T].decls.collect {
       case m: MethodSymbol if m.isCaseAccessor =>

@@ -18,7 +18,7 @@ class DefaultBodyParsers @Inject()(
    val errorHandler : HttpErrorHandler
   )  extends PlayBodyParsers {
 
-  def jsonRefined[A](implicit reader: Reads[A], schema : JsonSchema) = {
+  def jsonRefined[A](implicit reader: Reads[A]) = {
 
     BodyParser("json reader") { request =>
       implicit val ec = ExecutionContext.global
@@ -35,7 +35,7 @@ class DefaultBodyParsers @Inject()(
                 Future.successful(Left(Results.BadRequest(msg)))
               }
               case _ => {
-                val error = JsError.toJson(jsError) ++ Json.obj("_schema" ->    Json.parse(schema.value).as[JsObject])
+                val error = JsError.toJson(jsError) ++ Json.obj("_schema" -> Json.obj("todo"-> true))
                 Future.successful(Left(Results.BadRequest(error)))
               
               }
