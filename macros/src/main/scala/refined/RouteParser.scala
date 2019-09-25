@@ -1,6 +1,7 @@
 package refined
 import java.io.File
 
+import play.api.libs.json.JsValue
 import play.api.mvc._
 import play.routes.compiler.{HandlerCall, Route, RoutesFileParser}
 
@@ -30,16 +31,14 @@ object RouteParser {
 
   def controllerPath(call : HandlerCall) : String =  s"${call.packageName.getOrElse("")}.${call.controller}"
 
-  def impl(c: scala.reflect.macros.whitebox.Context): c.Expr[Any] = {
+  def impl(c: scala.reflect.macros.whitebox.Context): c.Expr[JsValue] = {
     import c.universe._
-
-    val controllers = routes.toList.flatMap(r => getBodyType(c, r.call))
-    val jsons = controllers.map(controller => JsonSchema.getJsonSchema(c)(controller))
-    println("jsons = "+ q"""..${jsons}""")
-    c.Expr(q"""..${jsons}""")
+    val bodyTypes = routes.toList.flatMap(r =>getBodyType(c, r.call))
+    val jsons = JsonSchema.getJsonSchemas(c)(bodyTypes)
+    c.Expr(q"""${jsons}""")
   }
 
-  private def getBodyType(c: whitebox.Context, handlerCall: HandlerCall): Iterable[c.universe.Type] = {
+  private def getBodyType(c: whitebox.Context, handlerCall: HandlerCall): Option[(HandlerCall,c.universe.Type)] = {
     import c.universe._
 
 
@@ -52,8 +51,6 @@ object RouteParser {
     publicMethods
       .filter(_.asMethod.typeSignature.resultType <:< actionT)
       .filter(_.asMethod.name.decodedName.toString == handlerCall.method)
-      .flatMap(_.asMethod.typeSignature.resultType.typeArgs.headOption)
-
-
+      .flatMap(_.asMethod.typeSignature.resultType.typeArgs.headOption).headOption.map((handlerCall,_))
   }
 }

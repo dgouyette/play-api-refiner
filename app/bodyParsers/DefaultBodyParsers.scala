@@ -2,14 +2,13 @@ package bodyParsers
 import akka.stream.Materializer
 import play.api.http.{DefaultHttpErrorHandler, ParserConfiguration}
 import play.api.libs.Files.TemporaryFileCreator
-import play.api.libs.json.{JsError, Reads}
+import play.api.libs.json.{JsError, JsObject, JsValue, Json, Reads}
 import play.api.mvc.{BodyParser, PlayBodyParsers, Results}
+
 import scala.concurrent.{ExecutionContext, Future}
 import javax.inject._
 import play.api.http.HttpErrorHandler
 import refined.JsonSchema
-import play.api.libs.json.Json
-import play.api.libs.json.JsObject
 
 class DefaultBodyParsers @Inject()(
    val materializer: Materializer,
@@ -18,7 +17,7 @@ class DefaultBodyParsers @Inject()(
    val errorHandler : HttpErrorHandler
   )  extends PlayBodyParsers {
 
-  def jsonRefined[A](implicit reader: Reads[A]) = {
+  def jsonRefined[A](implicit reader: Reads[A], schema : JsValue) = {
 
     BodyParser("json reader") { request =>
       implicit val ec = ExecutionContext.global
@@ -35,7 +34,7 @@ class DefaultBodyParsers @Inject()(
                 Future.successful(Left(Results.BadRequest(msg)))
               }
               case _ => {
-                val error = JsError.toJson(jsError) ++ Json.obj("_schema" -> Json.obj("todo"-> true))
+                val error = JsError.toJson(jsError) ++ Json.obj("_schema" -> schema)
                 Future.successful(Left(Results.BadRequest(error)))
               
               }

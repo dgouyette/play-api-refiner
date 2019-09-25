@@ -1,12 +1,11 @@
 package refined
 
-import eu.timepit.refined.api.Refined
 import eu.timepit.refined.boolean._
 import eu.timepit.refined.collection.{NonEmpty, _}
 import eu.timepit.refined.numeric.Positive
 import org.slf4j.LoggerFactory
 import play.api.libs.json._
-import refined.JsonSchema.buildJsonSchema
+import play.routes.compiler.HandlerCall
 import shapeless.ops.nat.ToInt
 
 import scala.language.experimental.macros
@@ -31,20 +30,19 @@ object JsonSchema {
     c.Expr[JsValue](q"""${r}""")
   }
 
+  def getJsonSchemas(c: scala.reflect.macros.whitebox.Context)(types : List[(HandlerCall,c.universe.Type)]) = {
+    import c.universe._
+    val json = types.map(t=> Json.obj( t._1.packageName.getOrElse("")+"_"+t._1.method ->  buildJsonSchema(c)(c.WeakTypeTag(t._2)))    ).reduce( _ deepMerge _)
+
+
+
+    implicit val l: c.universe.Liftable[JsObject] = Liftable((in: JsObject) => q"play.api.libs.json.Json.parse(${in.toString()})")
+    c.Expr[JsValue](q"""${json}""")
+  }
+
   private def buildJsonSchema[T](c: scala.reflect.macros.whitebox.Context)(implicit tag: c.WeakTypeTag[T]) = {
     import c.universe._
 
-    def sizeT(sizeTyp : Type) : Int = {
-      val toIntTree = c.inferImplicitValue(c.typecheck(tq"_root_.shapeless.ops.nat.ToInt[$sizeTyp]", mode = c.TYPEmode).tpe, silent = false)
-      val toInt = c.eval(c.Expr(c.untypecheck(toIntTree.duplicate)))
-      toInt.asInstanceOf[ToInt[_]].apply()
-    }
-    
-    def size(p : Type) : Int = p.typeArgs match {          
-        case List(other) => other.toString().replace("shapeless.nat._", "").toInt // ugly patch  but no simple solution for now
-    }
-
-    val refinedTypeOf = typeOf[Refined[_, _]]
     val minSizeTypeOf = typeOf[MinSize[_]]
     val maxSizeTypeOf = typeOf[MaxSize[_]]
     val sizeTC = typeOf[eu.timepit.refined.collection.Size[_]]
