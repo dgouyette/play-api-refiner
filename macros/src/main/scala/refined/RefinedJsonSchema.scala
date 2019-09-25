@@ -15,7 +15,12 @@ object JsonSchema {
 
   private lazy val LOGGER = LoggerFactory.getLogger(JsonSchema.getClass.toGenericString)
 
-  def jsonSchema[T]: String = macro impl[T]
+  def jsonSchema[T]: JsObject = macro impl[T]
+
+  def impl[T: c.WeakTypeTag](c: scala.reflect.macros.whitebox.Context): c.Expr[JsObject] = {
+    import c.universe._
+    c.Expr[JsObject](q"""${play.api.libs.json.Json.obj("hello"->"world")}""")
+  }
   
   def getJsonSchema(c: scala.reflect.macros.whitebox.Context)(t : c.universe.Type) = {
     import c.universe._
@@ -105,9 +110,5 @@ object JsonSchema {
 
   }
 
-  def impl[T: c.WeakTypeTag](c: scala.reflect.macros.whitebox.Context): c.Expr[String] = {
-    import c.universe._
-    val r = buildJsonSchema(c)
-    c.Expr[String](q"""${r.toString()}""")
-  }
+
 }
