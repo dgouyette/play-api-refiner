@@ -68,7 +68,6 @@
             "/Users/damiengouyette/Library/Caches/Coursier/v1/https/repo.scala-sbt.org/scalasbt/sbt-plugin-releases/com.typesafe.play/sbt-plugin/scala_2.12/sbt_1.0/2.7.3/jars/sbt-plugin.jar",
             "/Users/damiengouyette/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-sbt/launcher-interface/1.1.3/launcher-interface-1.1.3.jar",
             "/Users/damiengouyette/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/lm-coursier-shaded_2.12/2.0.0-RC3-3/lm-coursier-shaded_2.12-2.0.0-RC3-3.jar",
-            "/Users/damiengouyette/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalameta/sbt-metals_2.12_1.0/0.7.5/sbt-metals-0.7.5.jar",
             "/Users/damiengouyette/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/play-exceptions/2.7.3/play-exceptions-2.7.3.jar",
             "/Users/damiengouyette/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/google/code/gson/gson/2.2.4/gson-2.2.4.jar",
             "/Users/damiengouyette/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/eclipse/jgit/org.eclipse.jgit/4.9.0.201710071750-r/org.eclipse.jgit-4.9.0.201710071750-r.jar",
@@ -179,6 +178,7 @@
             "/Users/damiengouyette/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-sbt/zinc-core_2.12/1.3.0/zinc-core_2.12-1.3.0.jar",
             "/Users/damiengouyette/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/typesafe/play/build-link/2.7.3/build-link-2.7.3.jar",
             "/Users/damiengouyette/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/typesafe/jse_2.12/1.2.4/jse_2.12-1.2.4.jar",
+            "/Users/damiengouyette/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalameta/sbt-metals_2.12_1.0/0.7.6/sbt-metals-0.7.6.jar",
             "/Users/damiengouyette/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-sbt/zinc-persist_2.12/1.3.0/zinc-persist_2.12-1.3.0.jar",
             "/Users/damiengouyette/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/net/java/dev/jna/jna-platform/4.5.0/jna-platform-4.5.0.jar"
         ],
@@ -744,18 +744,6 @@
                             "name" : "sbt-plugin",
                             "classifier" : "javadoc",
                             "path" : "/Users/damiengouyette/Library/Caches/Coursier/v1/https/repo.scala-sbt.org/scalasbt/sbt-plugin-releases/com.typesafe.play/sbt-plugin/scala_2.12/sbt_1.0/2.7.3/docs/sbt-plugin-javadoc.jar"
-                        }
-                    ]
-                },
-                {
-                    "organization" : "org.scalameta",
-                    "name" : "sbt-metals",
-                    "version" : "0.7.5",
-                    "configurations" : "default",
-                    "artifacts" : [
-                        {
-                            "name" : "sbt-metals",
-                            "path" : "/Users/damiengouyette/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalameta/sbt-metals_2.12_1.0/0.7.5/sbt-metals-0.7.5.jar"
                         }
                     ]
                 },
@@ -1526,6 +1514,18 @@
                         {
                             "name" : "jse_2.12",
                             "path" : "/Users/damiengouyette/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/typesafe/jse_2.12/1.2.4/jse_2.12-1.2.4.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization" : "org.scalameta",
+                    "name" : "sbt-metals",
+                    "version" : "0.7.6",
+                    "configurations" : "default",
+                    "artifacts" : [
+                        {
+                            "name" : "sbt-metals",
+                            "path" : "/Users/damiengouyette/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalameta/sbt-metals_2.12_1.0/0.7.6/sbt-metals-0.7.6.jar"
                         }
                     ]
                 },

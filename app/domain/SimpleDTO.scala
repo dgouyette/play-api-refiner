@@ -1,26 +1,35 @@
 package domain
 
-import eu.timepit.refined._
-import eu.timepit.refined.string._
 import eu.timepit.refined.api._
-import eu.timepit.refined.numeric._
 import eu.timepit.refined.collection._
-
+import eu.timepit.refined.numeric._
 import play.api.libs.json._
-import play.api.libs.json.Reads._
-import play.api.libs.functional.syntax._
-import RefinedRuntimeValidator._
+import refined.JsonSchema
+import domain.RefinedRuntimeValidator._
 sealed trait Color
 case object Blue extends Color
 case object White extends Color
 case object Red extends Color
 
+case class BasicDTO(nonEmptyString : String Refined NonEmpty)
+case class TwoFieldsDTO(positiveInt : Int Refined Positive, arrayOfString : List[String])
+object TwoFieldsDTO {
+  implicit val fmt = Json.format[TwoFieldsDTO]
+  implicit val schema = JsonSchema.jsonSchema[TwoFieldsDTO]
+
+}
+object BasicDTO {
+  implicit val fmt = Json.format[BasicDTO]
+  implicit val schema = JsonSchema.jsonSchema[BasicDTO]
+}
+
 case class SimpleDTO(first : String Refined NonEmpty,
                     second : Int Refined Positive,
-                    third : List[Int],  
+                    third : List[Int],
                     quarte : List[String],
                     enumValue : Color,
                     number : BigDecimal)
+
 
 object SimpleDTO {
 

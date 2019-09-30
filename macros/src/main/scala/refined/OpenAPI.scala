@@ -11,16 +11,14 @@ import scala.reflect.macros.whitebox
 
 object OpenAPI {
 
-  def fromRouteFile: Any = macro impl
+  def fromRoutesFile(routePath: String) : Any = macro impl
 
-  lazy val routes: Seq[Route] = {
-
-    val routeFile = "conf/routes"
-    val lines = Source.fromFile(routeFile).getLines()
+  private def routes(routePath : String): Seq[Route] = {
+    val lines = Source.fromFile(routePath).getLines()
       .filterNot(_.trim.isEmpty)
       .filterNot(_.trim.startsWith("#"))
 
-    val file = new File(routeFile)
+    val file = new File(routePath)
 
     RoutesFileParser.parseContent(lines.mkString("\n"), file)
       .fold(
@@ -29,20 +27,18 @@ object OpenAPI {
       ).collect { case r: Route => r }
   }
 
-  def controllerPath(call : HandlerCall) : String =  s"${call.packageName.getOrElse("")}.${call.controller}"
+  private def controllerPath(call : HandlerCall) : String =  s"${call.packageName.getOrElse("")}.${call.controller}"
 
-  def impl(c: scala.reflect.macros.whitebox.Context): c.Expr[JsValue] = {
+  def impl(c: scala.reflect.macros.whitebox.Context)(routePath : c.Expr[String]): c.Expr[JsValue] = {
     import c.universe._
-    val bodyTypes = routes.toList.flatMap(r =>getBodyType(c, r))
+    val q"${r : String} " = routePath.tree
+    val bodyTypes = routes(r).toList.flatMap(r =>getBodyType(c, r))
     val jsons = JsonSchema.openAPI(c)(bodyTypes)
-
     c.Expr(q"""${jsons}""")
   }
 
   private def getBodyType(c: whitebox.Context, r: Route): Option[(Route,c.universe.Type)] = {
     import c.universe._
-
-
     val controllerClass = c.mirror.staticClass(controllerPath(r.call))
     val clazzInfo = controllerClass.info
     val publicMethods = clazzInfo.decls.filterNot(_.isPrivate).filter(_.isMethod)
