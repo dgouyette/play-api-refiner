@@ -7,4 +7,7 @@
 GET     /                           controllers.HomeController.index
 POST    /                           controllers.HomeController.create
 GET     /doc                        controllers.OpenAPIController.home
-#->      /                        controllers.OpenAPIController.ApiRouter
+GET     /doc/json                        controllers.OpenAPIController.json
+
+#->      /                          controllers.OpenAPIController.ApiRouter
+GET      /assets/*file              controllers.Assets.at(path="/public", file)

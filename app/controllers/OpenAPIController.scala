@@ -9,7 +9,11 @@ class OpenAPIController @Inject()(cc: ControllerComponents) extends AbstractCont
 
   def home: Action[Unit] = Action(parse.empty) {
     implicit  req =>
-      Ok(refined.OpenAPI.fromRoutesFile("conf/routes"))
+    Ok(views.html.Application.index())
+  }
 
+  def json: Action[Unit] = Action(parse.empty) {
+    implicit  req =>
+     Ok(refined.OpenAPI.fromRoutesFile("conf/routes"))
   }
 }

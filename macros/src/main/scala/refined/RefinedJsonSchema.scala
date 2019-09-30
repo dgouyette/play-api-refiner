@@ -83,7 +83,7 @@ object JsonSchema {
           case _refinedType :: _type :: _predicate :: Nil   =>extractArgs(List(_refinedType)) ++   extractArgs(List(_type)) ++ extractArgs(List(_predicate))
 
           case _type :: Nil if _type =:=  typeOf[String]  => Json.obj("schema"-> Json.obj("type" -> "string"), "required"-> true)
-          case _type :: Nil if _type =:= typeOf[Int]  => Json.obj("schema"->  Json.obj("type" -> "int"), "required"-> true)
+          case _type :: Nil if _type =:= typeOf[Int]  => Json.obj("schema"->  Json.obj("type" -> "integer"), "required"-> true)
           case _type :: Nil if _type =:= typeOf[BigDecimal] ||  _type =:= typeOf[Double] || _type =:= typeOf[Float]  => Json.obj("type" -> "number")
 
           //case _predicate :: Nil if _predicate =:= typeOf[Positive] => Json.obj("minValue" ->JsNumber(1))

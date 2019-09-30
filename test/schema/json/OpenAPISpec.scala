@@ -21,7 +21,7 @@ class OpenAPISpec extends PlaySpec {
       val r = OpenAPI.fromRoutesFile("./test/resources/TwoFields.routes")
       (r \ "paths").as[JsObject] mustBe Json.parse(""" 
       {"/":{"post":{"parameters":[
-        {"schema":{"type":"int"},"name":"positiveInt","in":"query","required":true},
+        {"schema":{"type":"integer"},"name":"positiveInt","in":"query","required":true},
         {"schema":{"type":"array"},"name":"arrayOfString","in":"query","required":true}        
         ]}}}
       """)
