@@ -16,7 +16,7 @@ class HomeController @Inject()(cc: ControllerComponents, bp: DefaultBodyParsers,
 
   def index(): Action[Unit] = Action(parse.empty) {
     implicit request =>
-      Ok(Json.toJson(SimpleDTO("a key", 2, List(5), List("value"), Red, BigDecimal(42))).as[JsObject])
+      Ok(Json.toJson(SimpleDTO("a key", 2, BigDecimal(42))).as[JsObject])
   }
 
   implicit val simpleDTOfmt = SimpleDTO.fmt

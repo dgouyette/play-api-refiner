@@ -25,9 +25,9 @@ object BasicDTO {
 
 case class SimpleDTO(first : String Refined NonEmpty,
                     second : Int Refined Positive,
-                    third : List[Int],
-                    quarte : List[String],
-                    enumValue : Color,
+                    //third : List[Int],
+                    //quarte : List[String],
+                    //enumValue : Color,
                     number : BigDecimal)
 
 

@@ -1,13 +1,8 @@
-# Routes
-# This file defines all application routes (Higher priority routes first)
-# https://www.playframework.com/documentation/latest/ScalaRouting
-# ~~~~
-
-# An example controller showing a sample home page
-GET     /                           controllers.HomeController.index
-POST    /                           controllers.HomeController.create
-GET     /doc                        controllers.OpenAPIController.home
-GET     /doc/json                        controllers.OpenAPIController.json
+GET         /                                controllers.HomeController.index
+POST        /                                controllers.HomeController.create
+POST        /createWithNonEmptyString        controllers.HomeController.createWithNonEmptyString
+GET         /doc                             controllers.OpenAPIController.home
+GET         /doc/json                        controllers.OpenAPIController.json
 
 #->      /                          controllers.OpenAPIController.ApiRouter
-GET      /assets/*file              controllers.Assets.at(path="/public", file)
+GET         /assets/*file                    controllers.Assets.at(path="/public", file)
