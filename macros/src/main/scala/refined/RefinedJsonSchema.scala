@@ -79,27 +79,16 @@ object JsonSchema {
 
       def extractArgs(typeArgs : Seq[Type]) :JsObject =  {
         typeArgs match {
-          case _type :: _predicate :: Nil if _type <:< listTypeOf => Json.obj("schema"-> Json.obj("type" -> "array"),"required"-> true)  //++ Json.obj("items"-> extractArgs(List(_predicate)))
-          case _refinedType :: _type :: _predicate :: Nil   =>extractArgs(List(_refinedType)) ++   extractArgs(List(_type)) ++ extractArgs(List(_predicate))
+          case _type :: _predicate :: Nil if _type <:< listTypeOf => Json.obj("schema"-> Json.obj("type" -> "array", "items"-> extractArgs(List(_predicate))))
+          case _refinedType :: _type :: _predicate :: Nil   =>extractArgs(List(_refinedType)) ++  Json.obj("schema" -> extractArgs(List(_type))) ++ extractArgs(List(_predicate))
 
-          case _type :: Nil if _type =:=  typeOf[String]  => Json.obj("schema"-> Json.obj("type" -> "string"), "required"-> true)
-          case _type :: Nil if _type =:= typeOf[Int]  => Json.obj("schema"->  Json.obj("type" -> "integer"), "required"-> true)
+          case _type :: Nil if _type =:=  typeOf[String]  => Json.obj("type" -> "string")
+          case _type :: Nil if _type =:= typeOf[Int]  => Json.obj("type" -> "integer")
           case _type :: Nil if _type =:= typeOf[BigDecimal] ||  _type =:= typeOf[Double] || _type =:= typeOf[Float]  => Json.obj("type" -> "number")
-
-          //case _predicate :: Nil if _predicate =:= typeOf[Positive] => Json.obj("minValue" ->JsNumber(1))
-          
-          
-          case _type :: Nil if _type <:< subTypeOfListTypeOf[String] => Json.obj("type" -> "array")  ++ Json.obj("items"-> Json.obj("type" -> "string"))
-          case _type :: Nil if _type <:< subTypeOfListTypeOf[Int] => Json.obj("type" -> "array")  ++ Json.obj("items"-> Json.obj("type" -> "integer"))
           case _type :: Nil if _type.typeSymbol.asClass.isSealed  => Json.obj("enum" ->values(_type.typeSymbol),"type" -> "string")
 
           case _predicate :: Nil if supportedFormats.contains(_predicate.typeSymbol.name.toString())  =>Json.obj("format" -> _predicate.typeSymbol.name.toString().toLowerCase())
-          //case _predicate :: Nil if _predicate <:< minSizeTypeOf =>  Json.obj("minLength" ->JsNumber(size(_predicate)))
-          //case _predicate :: Nil if _predicate <:< maxSizeTypeOf =>  Json.obj("maxLength" ->  JsNumber(size(_predicate)))
-          //case _predicate :: Nil if _predicate <:< sizeTC =>  Json.obj("maxLength" ->  JsNumber(sizeT(_predicate)))
-
           case _predicate :: Nil if _predicate <:< andTypeOf =>   _predicate.typeArgs.map(p =>extractArgs(List(p))).reduce(_ ++ _)
-          //case _predicate :: Nil  if _predicate =:= nonEmptyTypeOf =>  Json.obj("minLength"-> 1)
           case other => Json.obj()//Json.obj("type" ->  "other", "value"-> other.map(o => "["+o.toString()+"]").mkString(","), "class"-> other.getClass().toGenericString())
         }
       }

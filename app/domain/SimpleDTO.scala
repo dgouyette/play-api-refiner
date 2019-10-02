@@ -12,7 +12,13 @@ case object White extends Color
 case object Red extends Color
 
 case class BasicDTO(nonEmptyString : String Refined NonEmpty)
+case class ArrayOfStringDTO(values : List[String])
 case class TwoFieldsDTO(positiveInt : Int Refined Positive, arrayOfString : List[String])
+
+object ArrayOfStringDTO {
+  implicit val fmt = Json.format[ArrayOfStringDTO]
+  implicit val schema = JsonSchema.jsonSchema[ArrayOfStringDTO]
+}
 object TwoFieldsDTO {
   implicit val fmt = Json.format[TwoFieldsDTO]
   implicit val schema = JsonSchema.jsonSchema[TwoFieldsDTO]
@@ -25,8 +31,8 @@ object BasicDTO {
 
 case class SimpleDTO(first : String Refined NonEmpty,
                     second : Int Refined Positive,
-                    //third : List[Int],
-                    //quarte : List[String],
+                    third : List[Int],
+                    quarte : List[String],
                     //enumValue : Color,
                     number : BigDecimal)
 

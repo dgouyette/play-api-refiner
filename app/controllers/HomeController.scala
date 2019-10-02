@@ -1,14 +1,13 @@
 package controllers
 
 import bodyParsers.DefaultBodyParsers
-import domain.{BasicDTO, Red, SimpleDTO}
+import domain.{ArrayOfStringDTO, BasicDTO, Red, SimpleDTO, TwoFieldsDTO}
 import eu.timepit.refined.auto._
 import javax.inject._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 import play.api.mvc._
 import refined.JsonSchema
-import domain.TwoFieldsDTO
 
 @Singleton
 class HomeController @Inject()(cc: ControllerComponents, bp: DefaultBodyParsers, routesProvider: Provider[play.api.routing.Router]) extends AbstractController(cc) {
@@ -16,7 +15,7 @@ class HomeController @Inject()(cc: ControllerComponents, bp: DefaultBodyParsers,
 
   def index(): Action[Unit] = Action(parse.empty) {
     implicit request =>
-      Ok(Json.toJson(SimpleDTO("a key", 2, BigDecimal(42))).as[JsObject])
+      Ok(Json.toJson(SimpleDTO("a key", 2, List(5), List("value"), BigDecimal(42))).as[JsObject])
   }
 
   implicit val simpleDTOfmt = SimpleDTO.fmt
@@ -33,6 +32,11 @@ class HomeController @Inject()(cc: ControllerComponents, bp: DefaultBodyParsers,
   }
 
   def createWithTwoFields: Action[TwoFieldsDTO] = Action(bp.jsonRefined(TwoFieldsDTO.fmt, TwoFieldsDTO.schema)){
+    implicit  req =>
+      Created
+  }
+
+  def createArrayOfString: Action[ArrayOfStringDTO] = Action(bp.jsonRefined(ArrayOfStringDTO.fmt, ArrayOfStringDTO.schema)){
     implicit  req =>
       Created
   }
