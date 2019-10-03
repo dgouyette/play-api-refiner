@@ -65,8 +65,8 @@ object JsonSchema {
           val toInt = c.eval(c.Expr(c.untypecheck(toIntTree.duplicate)))
           toInt.asInstanceOf[ToInt[_]].apply()
         }
-        
-        def size(p : Type) : Int = p.typeArgs match {          
+
+        def size(p : Type) : Int = p.typeArgs match {
             case List(other) => other.toString().replace("shapeless.nat._", "").toInt // ugly patch  but no simple solution for now
         }
 
@@ -80,19 +80,22 @@ object JsonSchema {
       def extractArgs(typeArgs : Seq[Type]) :JsObject =  {
         typeArgs match {
           case _type :: _predicate :: Nil if _type <:< listTypeOf => Json.obj("schema"-> Json.obj("type" -> "array", "items"-> extractArgs(List(_predicate))))
-          case _refinedType :: _type :: _predicate :: Nil   =>extractArgs(List(_refinedType)) ++  Json.obj("schema" -> extractArgs(List(_type))) ++ extractArgs(List(_predicate))
+          case _refinedType :: _type :: _predicate :: Nil   =>extractArgs(List(_refinedType)) deepMerge  Json.obj("schema" -> extractArgs(List(_type))) deepMerge extractArgs(List(_predicate))
 
           case _type :: Nil if _type =:=  typeOf[String]  => Json.obj("type" -> "string")
           case _type :: Nil if _type =:= typeOf[Int]  => Json.obj("type" -> "integer")
           case _type :: Nil if _type =:= typeOf[BigDecimal] ||  _type =:= typeOf[Double] || _type =:= typeOf[Float]  => Json.obj("type" -> "number")
           case _type :: Nil if _type.typeSymbol.asClass.isSealed  => Json.obj("enum" ->values(_type.typeSymbol),"type" -> "string")
 
+          case _predicate :: Nil if _predicate =:= typeOf[Positive] => Json.obj("schema" ->  Json.obj( "minimum" ->JsNumber(1)))
+
+
           case _predicate :: Nil if supportedFormats.contains(_predicate.typeSymbol.name.toString())  =>Json.obj("format" -> _predicate.typeSymbol.name.toString().toLowerCase())
           case _predicate :: Nil if _predicate <:< andTypeOf =>   _predicate.typeArgs.map(p =>extractArgs(List(p))).reduce(_ ++ _)
           case other => Json.obj()//Json.obj("type" ->  "other", "value"-> other.map(o => "["+o.toString()+"]").mkString(","), "class"-> other.getClass().toGenericString())
         }
       }
-        Json.obj("name"-> m.name.decodedName.toString, "in"-> "query") ++   extractArgs(List(typeSymbol)  ++ typeArgs)
+        Json.obj("name"-> m.name.decodedName.toString, "in"-> "query") deepMerge extractArgs(List(typeSymbol)  ++ typeArgs)
     }
     r
 

@@ -37,7 +37,7 @@ class OpenAPISpec extends PlaySpec {
       (r \ "paths").as[JsObject] mustBe Json.parse(
         """
       {"/":{"post":{"parameters":[
-        {"schema":{"type":"integer"},"in":"query","name":"positiveInt"},
+        {"schema":{"type":"integer","minimum":1},"in":"query","name":"positiveInt"},
         {"schema":{"type":"array","items":{"type":"string"}},"in":"query","name":"arrayOfString"}
 
         ]}}}
