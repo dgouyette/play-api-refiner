@@ -23,21 +23,21 @@ class HomeController @Inject()(cc: ControllerComponents, bp: DefaultBodyParsers,
 
   def create(): Action[SimpleDTO] = Action(bp.jsonRefined(simpleDTOfmt, dtoSchema)) {
     implicit request =>
-      Created
+      Ok
   }
 
   def createWithNonEmptyString: Action[BasicDTO] = Action(bp.jsonRefined(BasicDTO.fmt, BasicDTO.schema)){
     implicit  req =>
-      Created
+      Ok
   }
 
   def createWithTwoFields: Action[TwoFieldsDTO] = Action(bp.jsonRefined(TwoFieldsDTO.fmt, TwoFieldsDTO.schema)){
     implicit  req =>
-      Created
+      Ok
   }
 
   def createArrayOfString: Action[ArrayOfStringDTO] = Action(bp.jsonRefined(ArrayOfStringDTO.fmt, ArrayOfStringDTO.schema)){
     implicit  req =>
-      Created
+      Ok
   }
 }
