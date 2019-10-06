@@ -11,7 +11,7 @@ lazy val root = (project in file("."))
   .dependsOn(macros)
   
 
-scalaVersion := "2.13.0"
+scalaVersion := "2.13.1"
 
 libraryDependencies += guice
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.3" % Test
