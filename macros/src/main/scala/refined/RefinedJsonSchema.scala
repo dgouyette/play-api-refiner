@@ -40,10 +40,12 @@ object JsonSchema {
         s"/$path" ->
           Json.obj(method ->
             Json.obj("requestBody" ->
-              Json.obj("content"->
+              Json.obj("content" ->
                 Json.obj("application/json" ->
-                  Json.obj("$ref" ->  s"#/components/schemas/${method}_${path}")).as[JsObject])
-            ))
+                  Json.obj("schema" ->
+                    Json.obj("$ref" -> s"#/components/schemas/${method}_${path}")).as[JsObject]),
+                "responses" -> "200"
+              )))
 
       )}.reduce(_ deepMerge _)
     implicit val l: c.universe.Liftable[JsObject] = Liftable((in: JsObject) => q"play.api.libs.json.Json.parse(${in.toString()})")
