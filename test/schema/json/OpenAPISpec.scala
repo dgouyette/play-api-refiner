@@ -10,10 +10,22 @@ class OpenAPISpec extends PlaySpec {
   "route with BasicDTO with a single field" must {
     "return a valid OpenAPI Spec" in {
 
-      val r = OpenAPI.fromRoutesFile("./test/resources/CreateDTO.routes")
-      (r \ "paths").as[JsObject] mustBe Json.parse(
+      val r : JsValue = OpenAPI.fromRoutesFile("./test/resources/CreateDTO.routes")
+      r mustBe Json.parse(
         """
-      {"/":{"post":{"parameters":[{"schema":{"type":"string"},"name":"nonEmptyString","in":"query"}]}}}
+      {
+      "components":{
+        "schemas":{
+            "post_":{
+              "type":"object",
+              "properties":
+                {"nonEmptyString":{"minLength":1,"type":"string"}}}}},
+      "openapi":"3.0.0",
+      "paths":
+        {
+          "/":{"post":{
+            "requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/post_"}}}},
+            "responses":{"200":{"description":"OK"}}}}},"info":{"title":"API","version":"v1"}}
       """)
     }
   }
@@ -22,10 +34,19 @@ class OpenAPISpec extends PlaySpec {
   "route with a single field : array of string" must {
     "return a valid OpenAPI Spec" in {
 
-      val r = OpenAPI.fromRoutesFile("./test/resources/arrayOfString.routes")
-      (r \ "paths").as[JsObject] mustBe Json.parse(
+      val r:JsValue = OpenAPI.fromRoutesFile("./test/resources/arrayOfString.routes")
+      r mustBe Json.parse(
         """
-      {"/":{"post":{"parameters":[{"schema":{"type":"array","items":{"type": "string"}},"name":"values","in":"query"}]}}}
+      {
+        "components":
+          {"schemas":{"post_":{"type":"object","properties":{"values":{"type":"array","items":{"type":"string"}}}}}},
+        "openapi":"3.0.0",
+        "paths":{
+          "/":
+            {"post":
+              {
+                "requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/post_"}}}},
+                "responses":{"200":{"description":"OK"}}}}},"info":{"title":"API","version":"v1"}}
       """)
     }
   }
@@ -33,14 +54,19 @@ class OpenAPISpec extends PlaySpec {
 
   "route with TwoFieldsDTO with a two fields" must {
     "return a valid OpenAPI Spec" in {
-      val r = OpenAPI.fromRoutesFile("./test/resources/TwoFields.routes")
-      (r \ "paths").as[JsObject] mustBe Json.parse(
+      val r : JsValue = OpenAPI.fromRoutesFile("./test/resources/TwoFields.routes")
+      r mustBe Json.parse(
         """
-      {"/":{"post":{"parameters":[
-        {"schema":{"type":"integer","minimum":1},"in":"query","name":"positiveInt"},
-        {"schema":{"type":"array","items":{"type":"string"}},"in":"query","name":"arrayOfString"}
-
-        ]}}}
+      {
+        "components":
+          {"schemas":{
+            "post_":{"type":"object","properties":{"arrayOfString":{"type":"array","items":{"type":"string"}},"positiveInt":{"minValue":1,"type":"integer"}}}}},
+        "openapi":"3.0.0",
+        "paths":{
+          "/":
+            {"post":{
+              "requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/post_"}}}},
+              "responses":{"200":{"description":"OK"}}}}},"info":{"title":"API","version":"v1"}}
       """)
     }
   }
