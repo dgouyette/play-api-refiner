@@ -17,23 +17,23 @@ case class TwoFieldsDTO(positiveInt : Int Refined Positive, arrayOfString : List
 
 object ArrayOfStringDTO {
   implicit val fmt = Json.format[ArrayOfStringDTO]
-  implicit val schema = JsonSchema.jsonSchema[ArrayOfStringDTO]
+  implicit val schema = JsonSchema.asJsValue[ArrayOfStringDTO]
 }
 object TwoFieldsDTO {
   implicit val fmt = Json.format[TwoFieldsDTO]
-  implicit val schema = JsonSchema.jsonSchema[TwoFieldsDTO]
+  implicit val schema = JsonSchema.asJsValue[TwoFieldsDTO]
 
 }
 object BasicDTO {
   implicit val fmt = Json.format[BasicDTO]
-  implicit val schema = JsonSchema.jsonSchema[BasicDTO]
+  implicit val schema = JsonSchema.asJsValue[BasicDTO]
 }
 
 case class SimpleDTO(first : String Refined NonEmpty,
                     second : Int Refined Positive,
                     third : List[Int],
                     quarte : List[String],
-                    //enumValue : Color,
+                    enumValue : Color,
                     number : BigDecimal)
 
 

@@ -8,7 +8,6 @@ import play.api.mvc.{BodyParser, PlayBodyParsers, Results}
 import scala.concurrent.{ExecutionContext, Future}
 import javax.inject._
 import play.api.http.HttpErrorHandler
-import refined.JsonSchema
 
 class DefaultBodyParsers @Inject()(
    val materializer: Materializer,
@@ -17,7 +16,7 @@ class DefaultBodyParsers @Inject()(
    val errorHandler : HttpErrorHandler
   )  extends PlayBodyParsers {
 
-  def jsonRefined[A](implicit reader: Reads[A], schema : JsValue) = {
+  def jsonRefined[A](implicit reader: Reads[A], schema : JsValue): BodyParser[A] = {
 
     BodyParser("json reader") { request =>
       implicit val ec = ExecutionContext.global

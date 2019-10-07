@@ -9,13 +9,14 @@ lazy val macros = project
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
   .dependsOn(macros)
-  
+
 
 scalaVersion := "2.13.1"
 
 libraryDependencies += guice
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.3" % Test
 
+skip in publish := true
 
 Compile / scalacOptions += "-Ymacro-annotations"
 

@@ -3,7 +3,6 @@ package refined
 import eu.timepit.refined.boolean._
 import eu.timepit.refined.collection.{NonEmpty, _}
 import eu.timepit.refined.numeric.Positive
-import org.slf4j.LoggerFactory
 import play.api.libs.json._
 import play.routes.compiler.{HttpVerb, Route}
 import shapeless.ops.nat.ToInt
@@ -12,9 +11,9 @@ import scala.language.experimental.macros
 
 object JsonSchema {
 
-  private lazy val LOGGER = LoggerFactory.getLogger(JsonSchema.getClass.toGenericString)
 
-  def jsonSchema[T]: JsValue = macro impl[T]
+
+  def asJsValue[T]: JsValue = macro impl[T]
 
   def impl[T: c.WeakTypeTag](c: scala.reflect.macros.whitebox.Context): c.Expr[JsValue] = {
     import c.universe._

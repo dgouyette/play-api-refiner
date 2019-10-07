@@ -1,7 +1,7 @@
 package controllers
 
 import bodyParsers.DefaultBodyParsers
-import domain.{ArrayOfStringDTO, BasicDTO, Red, SimpleDTO, TwoFieldsDTO}
+import domain.{ArrayOfStringDTO, BasicDTO, Blue, Red, SimpleDTO, TwoFieldsDTO}
 import eu.timepit.refined.auto._
 import javax.inject._
 import play.api.libs.json.Reads._
@@ -15,15 +15,14 @@ class HomeController @Inject()(cc: ControllerComponents, bp: DefaultBodyParsers,
 
   def index(): Action[Unit] = Action(parse.empty) {
     implicit request =>
-      Ok(Json.toJson(SimpleDTO("a key", 2, List(5), List("value"), BigDecimal(42))).as[JsObject])
+      Ok(Json.toJson(SimpleDTO("a key", 2, List(5), List("value"),Blue, BigDecimal(42))).as[JsObject])
   }
 
   implicit val simpleDTOfmt = SimpleDTO.fmt
-  implicit val dtoSchema = JsonSchema.jsonSchema[SimpleDTO]
+  implicit val dtoSchema = JsonSchema.asJsValue[SimpleDTO]
 
   def create(): Action[SimpleDTO] = Action(bp.jsonRefined(simpleDTOfmt, dtoSchema)) {
-    implicit request =>
-      Ok
+    implicit request =>Ok
   }
 
   def createWithNonEmptyString: Action[BasicDTO] = Action(bp.jsonRefined(BasicDTO.fmt, BasicDTO.schema)){

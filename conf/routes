@@ -4,5 +4,8 @@ POST        /createWithNonEmptyString        controllers.HomeController.createWi
 GET         /doc                             controllers.OpenAPIController.home
 GET         /doc/json                        controllers.OpenAPIController.json
 
+
+
+
 #->      /                          controllers.OpenAPIController.ApiRouter
 GET         /assets/*file                    controllers.Assets.at(path="/public", file)
