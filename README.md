@@ -33,6 +33,15 @@ To return json errors based on org.dgouyette.refined classes you must import :
 import org.org.dgouyette.json.RefinedRuntimeValidator._
 ````
 
+### Json Schema generation
+
+```scala
+
+case class CollectionStringNonEmpty(e : List[String] Refined NonEmpty)
+JsonSchema.asJsValue[CollectionStringNonEmpty] // => {"e":{"minLength":1,"type":"array","items":{"type":"string"}}}
+
+```
+
 ### Json Schema on Client Error 
 
 ```scala
