@@ -8,11 +8,6 @@
 A tiny library to generate OpenAPI  documentation and json schema based on Refined's case classes.
 
 
-## Context
-
-
-
-
 ## Setup
 
 In order to use play-json-org.dgouyette.refined you need to add the following lines to your `build.sbt`:
