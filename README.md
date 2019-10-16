@@ -88,5 +88,21 @@ You will have this error
 }
 ```
 
+## Generate OpenAPI (Swagger) Documentation
 
+OpenAPIController : 
+````scala
+def json: Action[Unit] = Action(parse.empty) {
+    implicit  req =>
+     Ok(OpenAPI.fromRoutesFile("conf/routes"))
+  }
+````
+
+conf/routes
+```
+POST        /login                           controllers.HomeController.login
+GET         /doc/json                        controllers.OpenAPIController.json
+```
+
+![OpenAPI Documentation](openAPI.png)
 
