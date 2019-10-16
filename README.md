@@ -36,6 +36,8 @@ import org.org.dgouyette.json.RefinedRuntimeValidator._
 ### Json Schema on Client Error 
 
 ```scala
+case class LoginDTO(email  : String Refined NonEmpty, password : String Refined NonEmpty)
+
 
 @Singleton
 class HomeController @Inject()(bp: BodyParserWithJsonSchema) extends AbstractController(cc) {
