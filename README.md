@@ -1,4 +1,4 @@
-[![Build status](https://api.travis-ci.org/dgouyette/play-api-refined.svg?branch=develop)](https://travis-ci.com/dgouyette/play-api-refined.svg?branch=develop)
+[![Build status](https://api.travis-ci.com/dgouyette/play-api-refined.svg?branch=develop)](https://travis-ci.com/dgouyette/play-api-refined?branch=develop)
 [![codecov](https://codecov.io/gh/dgouyette/play-api-refined/branch/develop/graph/badge.svg)](https://codecov.io/gh/dgouyette/play-api-refined)
 [![License](https://img.shields.io/:license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
