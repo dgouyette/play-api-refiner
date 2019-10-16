@@ -2,6 +2,7 @@ package controllers
 
 
 import javax.inject._
+import org.dgouyette.refined.OpenAPI
 import play.api.mvc._
 
 @Singleton
@@ -14,6 +15,6 @@ class OpenAPIController @Inject()(cc: ControllerComponents) extends AbstractCont
 
   def json: Action[Unit] = Action(parse.empty) {
     implicit  req =>
-     Ok(refined.OpenAPI.fromRoutesFile("conf/routes"))
+     Ok(OpenAPI.fromRoutesFile("conf/routes"))
   }
 }

@@ -1,5 +1,7 @@
 GET         /                                controllers.HomeController.index
 POST        /                                controllers.HomeController.create
+
+POST        /login                          controllers.HomeController.login
 POST        /createWithNonEmptyString        controllers.HomeController.createWithNonEmptyString
 GET         /doc                             controllers.OpenAPIController.home
 GET         /doc/json                        controllers.OpenAPIController.json

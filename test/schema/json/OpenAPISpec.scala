@@ -1,7 +1,7 @@
 package schema.json
 
 import org.scalatestplus.play.PlaySpec
-import refined.OpenAPI
+import org.dgouyette.refined.OpenAPI
 import play.api.libs.json._
 
 class OpenAPISpec extends PlaySpec {

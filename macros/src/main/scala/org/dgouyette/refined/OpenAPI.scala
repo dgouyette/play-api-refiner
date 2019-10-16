@@ -1,4 +1,4 @@
-package refined
+package org.dgouyette.refined
 import java.io.File
 
 import play.api.libs.json.JsValue

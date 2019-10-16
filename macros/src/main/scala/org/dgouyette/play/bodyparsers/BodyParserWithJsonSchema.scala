@@ -1,15 +1,15 @@
-package bodyParsers
+package org.dgouyette.play.bodyparsers
+
 import akka.stream.Materializer
-import play.api.http.{DefaultHttpErrorHandler, ParserConfiguration}
+import javax.inject._
+import play.api.http.{HttpErrorHandler, ParserConfiguration}
 import play.api.libs.Files.TemporaryFileCreator
-import play.api.libs.json.{JsError, JsObject, JsValue, Json, Reads}
+import play.api.libs.json.{JsError, JsValue, Json, Reads}
 import play.api.mvc.{BodyParser, PlayBodyParsers, Results}
 
 import scala.concurrent.{ExecutionContext, Future}
-import javax.inject._
-import play.api.http.HttpErrorHandler
 
-class DefaultBodyParsers @Inject()(
+class BodyParserWithJsonSchema @Inject()(
    val materializer: Materializer,
    val config: ParserConfiguration,
    val temporaryFileCreator: TemporaryFileCreator,
@@ -27,17 +27,8 @@ class DefaultBodyParsers @Inject()(
           jsValue.validate(reader) map { a =>
             Future.successful(Right(a))
           } recoverTotal { jsError =>
-            errorHandler match {
-              case _ : DefaultHttpErrorHandler => {
-                val msg =s"${request.method}  on ${request.uri}"+ JsError.toFlatForm(jsError).mkString("\n")
-                Future.successful(Left(Results.BadRequest(msg)))
-              }
-              case _ => {
                 val error = JsError.toJson(jsError) ++ Json.obj("_schema" -> schema)
                 Future.successful(Left(Results.BadRequest(error)))
-              
-              }
-            }
           }
       }
     }

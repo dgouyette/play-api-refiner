@@ -7,7 +7,7 @@ import eu.timepit.refined.numeric._
 import eu.timepit.refined.string._
 import org.scalatestplus.play._
 import play.api.libs.json._
-import refined.JsonSchema
+import org.dgouyette.refined.JsonSchema
 import shapeless.nat._
 
 
@@ -41,25 +41,25 @@ class StackSpec extends PlaySpec {
   case class StringWithMaxSize22(l: String Refined MaxSize[_22])
   case class StringWithMinMax(m: String Refined (MinSize[_0] And MaxSize[_5]))
 
-  "String not refined" must {
+  "String not org.dgouyette.refined" must {
     "return a schema with type String" in {
       JsonSchema.asJsValue[SimpleString] mustBe Json.obj("a"->Json.obj("type"-> "string"))
     }
   }
 
-  "Int not refined" must {
+  "Int not org.dgouyette.refined" must {
     "return a schema with type Int" in {
       JsonSchema.asJsValue[SimpleInt] mustBe  Json.parse("""{"b":{"type":"integer"}}""")
     }
   }
 
-  "BigDecimal not refined" must {
+  "BigDecimal not org.dgouyette.refined" must {
     "return a schema with type number" in {
       JsonSchema.asJsValue[SimpleNumbers] mustBe Json.parse("""{"a":{"type":"number"},"b":{"type":"number"},"c":{"type":"number"}}""")
     }
   }
 
-  "Int refined Positive" must {
+  "Int org.dgouyette.refined Positive" must {
     "return a schema with type Int" in {
       JsonSchema.asJsValue[IntRefinedPositive] mustBe Json.parse("""{"c":{"minValue":1,"type":"integer"}}""")
     }

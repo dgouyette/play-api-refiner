@@ -1,16 +1,16 @@
 package controllers
 
-import bodyParsers.DefaultBodyParsers
-import domain.{ArrayOfStringDTO, BasicDTO, Blue, Red, SimpleDTO, TwoFieldsDTO}
+import org.dgouyette.play.bodyparsers.BodyParserWithJsonSchema
+import domain.{ArrayOfStringDTO, BasicDTO, Blue, LoginDTO, SimpleDTO, TwoFieldsDTO}
 import eu.timepit.refined.auto._
 import javax.inject._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 import play.api.mvc._
-import refined.JsonSchema
+import org.dgouyette.refined.JsonSchema
 
 @Singleton
-class HomeController @Inject()(cc: ControllerComponents, bp: DefaultBodyParsers, routesProvider: Provider[play.api.routing.Router]) extends AbstractController(cc) {
+class HomeController @Inject()(cc: ControllerComponents, bp: BodyParserWithJsonSchema, routesProvider: Provider[play.api.routing.Router]) extends AbstractController(cc) {
 
 
   def index(): Action[Unit] = Action(parse.empty) {
@@ -19,11 +19,17 @@ class HomeController @Inject()(cc: ControllerComponents, bp: DefaultBodyParsers,
   }
 
   implicit val simpleDTOfmt = SimpleDTO.fmt
+
+  implicit val loginSchema = JsonSchema.asJsValue[LoginDTO]
   implicit val dtoSchema = JsonSchema.asJsValue[SimpleDTO]
+  def login(): Action[LoginDTO] = Action(bp.jsonRefined(LoginDTO.fmt, loginSchema)) {
+    implicit request =>Ok
+  }
 
   def create(): Action[SimpleDTO] = Action(bp.jsonRefined(simpleDTOfmt, dtoSchema)) {
     implicit request =>Ok
   }
+
 
   def createWithNonEmptyString: Action[BasicDTO] = Action(bp.jsonRefined(BasicDTO.fmt, BasicDTO.schema)){
     implicit  req =>

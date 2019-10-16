@@ -21,6 +21,12 @@ class DepositSpec extends PlaySpec {
     "return an error" in {
       deposit(-100) mustBe Symbol("left")
       deposit(100) mustBe Right(AmountDeposited(100))
+
+      import eu.timepit.refined._
+      import eu.timepit.refined.api.Refined
+      import eu.timepit.refined.auto._
+      import eu.timepit.refined.numeric._
+     println(refineV[Positive](-5) )
     }
   }
 

@@ -4,8 +4,10 @@ import eu.timepit.refined.api._
 import eu.timepit.refined.collection._
 import eu.timepit.refined.numeric._
 import play.api.libs.json._
-import refined.JsonSchema
-import domain.RefinedRuntimeValidator._
+import org.dgouyette.refined.JsonSchema
+import org.dgouyette.refined.json.RefinedRuntimeValidator._
+
+
 sealed trait Color
 case object Blue extends Color
 case object White extends Color
@@ -27,6 +29,12 @@ object TwoFieldsDTO {
 object BasicDTO {
   implicit val fmt = Json.format[BasicDTO]
   implicit val schema = JsonSchema.asJsValue[BasicDTO]
+}
+case class LoginDTO(email  : String Refined NonEmpty,
+                    password : String Refined NonEmpty)
+object LoginDTO{
+  implicit val fmt = Json.format[LoginDTO]
+
 }
 
 case class SimpleDTO(first : String Refined NonEmpty,

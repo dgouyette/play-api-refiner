@@ -1,4 +1,4 @@
-package refined
+package org.dgouyette.refined
 
 import eu.timepit.refined.boolean._
 import eu.timepit.refined.collection.{NonEmpty, _}
